@@ -1,24 +1,50 @@
-# NEXUS: World Simulator
+# NEXUS: Симулятор мира
 
-AI-driven grand strategy and world simulation game built with Godot.
+**NEXUS** — стратегический симулятор государства и мира, в котором игрок управляет страной через цели, решения и приказы, а детерминированная симуляция рассчитывает последствия.
 
-## Vision
+## Идея
 
-NEXUS is a systems-first world simulator where players express goals and orders in natural language. An AI layer translates intent into structured game commands, while the deterministic simulation remains authoritative over economics, population, resources, politics, diplomacy, and time.
+Игрок может формулировать намерение обычным языком:
 
-## First milestone
+> Снизить безработицу и одновременно развить производство электроники.
 
-- One country
-- Ten provinces
-- Deterministic monthly simulation
-- Economy, population, employment, budget, trust and corruption
-- Structured player orders
-- Save/load
-- Basic UI
-- Automated release builds
+В дальнейшем AI будет переводить такие намерения в структурированные игровые приказы. При этом AI не является источником истины: экономику, население, ресурсы, бюджет, политику, дипломатию и течение времени рассчитывает само игровое ядро.
 
-AI integration comes after the deterministic simulation core.
+## Первый игровой прототип
 
-## Versioning
+- одна страна;
+- десять провинций;
+- детерминированная помесячная симуляция;
+- население и занятость;
+- экономика и бюджет;
+- благосостояние;
+- доверие;
+- коррупция;
+- структурированные приказы игрока;
+- сохранение и загрузка игры;
+- базовый интерфейс.
 
-We use Semantic Versioning (`v0.x.y` during development). Every public version will have a GitHub Release and changelog entry.
+AI-интеграция появится после создания надёжного детерминированного ядра.
+
+## Структура проекта
+
+- `game/` — игра и симуляция на Godot;
+- `launcher/` — будущий лаунчер и система обновлений;
+- `docs/` — документация проекта;
+- `tools/` — инструменты разработки;
+- `.github/workflows/` — автоматизация сборок и релизов.
+
+## Версии
+
+Используется Semantic Versioning:
+
+- `v0.x.y` — разработка;
+- `v1.0.0` — первая полноценная версия.
+
+Каждая публичная версия публикуется через GitHub Releases и получает запись в журнале изменений.
+
+## Принцип разработки
+
+**Сначала механика, потом AI.**
+
+Игровая симуляция должна оставаться воспроизводимой и проверяемой независимо от модели искусственного интеллекта.
