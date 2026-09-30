@@ -41,7 +41,7 @@ jobs:
         run: |
           mkdir -p build
           /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-debug "Android" build/NEXUS.apk
-          apksigner verify --verbose build/NEXUS.apk
+          $ANDROID_HOME/build-tools/35.0.1/apksigner verify --verbose build/NEXUS.apk
           unzip -l build/NEXUS.apk | grep 'lib/arm64-v8a/'
       - name: Загрузить APK
         uses: actions/upload-artifact@v4
@@ -53,4 +53,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v0.1.1 game/build/NEXUS.apk --repo ${{ github.repository }} --title "NEXUS v0.1.1 - Android test" --notes "Тестовый Android APK для установки на устройства ARM64."
+          gh release create v0.1.1 game/build/NEXUS.apk --repo ${{ github.repository }} --title "NEXUS v0.1.1 - Android test" --notes "Тестовый Android APK ARM64."
