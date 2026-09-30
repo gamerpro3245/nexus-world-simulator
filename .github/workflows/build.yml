@@ -22,12 +22,13 @@ jobs:
           packages: "platform-tools build-tools;35.0.1 platforms;android-35"
       - name: Скачать Godot 4.7.2
         run: |
-          mkdir -p /tmp/godot
+          mkdir -p /tmp/godot /tmp/godot/templates
           curl -L https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o /tmp/godot/godot.zip
           curl -L https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz -o /tmp/godot/templates.tpz
           unzip -q /tmp/godot/godot.zip -d /tmp/godot/bin
+          unzip -q /tmp/godot/templates.tpz -d /tmp/godot/templates
           mkdir -p ~/.local/share/godot/export_templates/4.7.2.stable
-          unzip -q /tmp/godot/templates.tpz -d ~/.local/share/godot/export_templates/4.7.2.stable
+          cp -r /tmp/godot/templates/templates/* ~/.local/share/godot/export_templates/4.7.2.stable/
           chmod +x /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64
       - name: Импортировать проект
         working-directory: game
