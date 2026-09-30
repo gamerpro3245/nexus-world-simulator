@@ -1,4 +1,4 @@
-name: Сборка NEXUS v0.1.1
+name: Сборка NEXUS Android
 
 on:
   workflow_dispatch:
@@ -12,68 +12,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Получить исходники
-        uses: actions/checkout@v5
-
-      - name: Настроить JDK 17
-        uses: actions/setup-java@v6
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v6
         with:
           java-version: "17"
           distribution: "temurin"
-
-      - name: Настроить Android SDK
-        uses: android-actions/setup-android@v4
+      - uses: android-actions/setup-android@v4
         with:
           packages: "platform-tools build-tools;35.0.1 platforms;android-35"
-
-      - name: Скачать Godot 4.7.2
+      - name: Скачать Godot и шаблоны
         run: |
-          mkdir -p /tmp/godot /tmp/godot/templates
-          curl -L https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o /tmp/godot/godot.zip
-          curl -L https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz -o /tmp/godot/templates.tpz
-          unzip -q /tmp/godot/godot.zip -d /tmp/godot/bin
-          unzip -q /tmp/godot/templates.tpz -d /tmp/godot/templates
+          mkdir -p /tmp/godot /tmp/templates
+          curl -L https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o /tmp/godot.zip
+          curl -L https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz -o /tmp/templates.tpz
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          unzip -q /tmp/templates.tpz -d /tmp/templates
           mkdir -p ~/.local/share/godot/export_templates/4.7.2.stable
-          cp -r /tmp/godot/templates/templates/* ~/.local/share/godot/export_templates/4.7.2.stable/
-          chmod +x /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64
-
-      - name: Создать release keystore
-        run: |
-          keytool -genkeypair -v             -keystore /tmp/nexus-release.keystore             -alias nexus             -keyalg RSA -keysize 2048 -validity 10000             -storepass nexusrelease             -keypass nexusrelease             -dname "CN=NEXUS,O=NEXUS,OU=Game,C=DE"
-
-      - name: Импортировать проект
+          find /tmp/templates -name android_release.apk -exec cp {} ~/.local/share/godot/export_templates/4.7.2.stable/ \;
+          find /tmp/templates -name android_debug.apk -exec cp {} ~/.local/share/godot/export_templates/4.7.2.stable/ \;
+          find /tmp/templates -name android_source.zip -exec cp {} ~/.local/share/godot/export_templates/4.7.2.stable/ \;
+          find /tmp/templates -name version.txt -exec cp {} ~/.local/share/godot/export_templates/4.7.2.stable/ \;
+          chmod +x /tmp/godot/Godot_v4.7.2-stable_linux.x86_64
+      - name: Проверить проект
         working-directory: game
-        run: /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64 --headless --editor --quit
-
-      - name: Собрать Windows
+        run: /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --editor --quit
+      - name: Собрать Android APK
         working-directory: game
         run: |
           mkdir -p build
-          /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-release "Windows Desktop" build/NEXUS.exe
-          cd build
-          zip -q NEXUS-Windows-v0.1.1.zip NEXUS.exe
-
-      - name: Собрать подписанный Android APK
-        working-directory: game
-        env:
-          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: /tmp/nexus-release.keystore
-          GODOT_ANDROID_KEYSTORE_RELEASE_USER: nexus
-          GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: nexusrelease
-        run: |
-          /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-release "Android" build/NEXUS.apk
+          /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-debug "Android" build/NEXUS.apk
           apksigner verify --verbose build/NEXUS.apk
-
-      - name: Загрузить сборки
+          unzip -l build/NEXUS.apk | grep 'lib/arm64-v8a/'
+      - name: Загрузить APK
         uses: actions/upload-artifact@v4
         with:
-          name: NEXUS-v0.1.1
-          path: |
-            game/build/NEXUS-Windows-v0.1.1.zip
-            game/build/NEXUS.apk
+          name: NEXUS-v0.1.1-Android
+          path: game/build/NEXUS.apk
           if-no-files-found: error
-
       - name: Опубликовать Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v0.1.1 game/build/NEXUS-Windows-v0.1.1.zip game/build/NEXUS.apk             --repo ${{ github.repository }}             --title "NEXUS v0.1.1 — Android fix"             --notes "Исправлена Android-сборка: ARM64 + ARMv7, release-подпись и обновлённый versionCode."
+          gh release create v0.1.1 game/build/NEXUS.apk --repo ${{ github.repository }} --title "NEXUS v0.1.1 - Android test" --notes "Тестовый Android APK для установки на устройства ARM64."
