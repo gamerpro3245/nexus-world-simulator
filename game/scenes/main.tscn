@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource path="res://scripts/main.gd" type="Script" id="1"]
+[ext_resource path="res://scripts/world_map.gd" type="Script" id="2"]
 
 [node name="Nexus" type="Control"]
 layout_mode = 3
@@ -16,16 +17,16 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 28.0
-offset_top = 22.0
-offset_right = -28.0
-offset_bottom = -22.0
+offset_left = 24.0
+offset_top = 18.0
+offset_right = -24.0
+offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 10
 
 [node name="Header" type="HBoxContainer" parent="Root"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
 
 [node name="Title" type="Label" parent="Root/Header"]
@@ -34,82 +35,97 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 30
 text = "NEXUS"
 
+[node name="Mode" type="Label" parent="Root/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 19
+text = "МИР • УПРАВЛЕНИЕ • СТРАТЕГИЯ"
+
 [node name="Date" type="Label" parent="Root/Header"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "1 марта 2026"
 
-[node name="Body" type="HBoxContainer" parent="Root"]
+[node name="Main" type="HBoxContainer" parent="Root"]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 18
-
-[node name="MapPanel" type="PanelContainer" parent="Root/Body"]
-custom_minimum_size = Vector2(700, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Map" type="Label" parent="Root/Body/MapPanel"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 26
-text = "КАРТА МИРА\n\nЗдесь появится интерактивная карта.\nСтраны → регионы → провинции."
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Sidebar" type="VBoxContainer" parent="Root/Body"]
-custom_minimum_size = Vector2(400, 0)
-layout_mode = 2
-size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="Country" type="Label" parent="Root/Body/Sidebar"]
+[node name="Map" type="Control" parent="Root/Main"]
+custom_minimum_size = Vector2(760, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2")
+
+[node name="Panel" type="VBoxContainer" parent="Root/Main"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="Country" type="Label" parent="Root/Main/Panel"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 25
-text = "Страна: Новая Республика"
+text = "НОВАЯ РЕСПУБЛИКА"
 
-[node name="Stats" type="Label" parent="Root/Body/Sidebar"]
+[node name="Stats" type="Label" parent="Root/Main/Panel"]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 20
-text = "Население: 25,0 млн\nБлагосостояние: 50\nДоверие: 50%\nБезработица: 8%\nБюджет: 1000\nКоррупция: 20%"
+theme_override_font_sizes/font_size = 18
 
-[node name="OrdersTitle" type="Label" parent="Root/Body/Sidebar"]
+[node name="Province" type="Label" parent="Root/Main/Panel"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Приказы"
+theme_override_font_sizes/font_size = 18
+text = "Провинция: Центр"
 
-[node name="OrderInput" type="LineEdit" parent="Root/Body/Sidebar"]
+[node name="Tabs" type="HBoxContainer" parent="Root/Main/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Economy" type="Button" parent="Root/Main/Panel/Tabs"]
+layout_mode = 2
+text = "Экономика"
+
+[node name="Politics" type="Button" parent="Root/Main/Panel/Tabs"]
+layout_mode = 2
+text = "Политика"
+
+[node name="Research" type="Button" parent="Root/Main/Panel/Tabs"]
+layout_mode = 2
+text = "Исследования"
+
+[node name="OrdersTitle" type="Label" parent="Root/Main/Panel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "ПРИКАЗЫ"
+
+[node name="OrderInput" type="LineEdit" parent="Root/Main/Panel"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+placeholder_text = "Например: построить завод в Центре"
+
+[node name="OrderButton" type="Button" parent="Root/Main/Panel"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-placeholder_text = "Например: построить завод в провинции 1"
+text = "Принять приказ"
 
-[node name="OrderButton" type="Button" parent="Root/Body/Sidebar"]
-custom_minimum_size = Vector2(0, 50)
+[node name="AdvanceButton" type="Button" parent="Root/Main/Panel"]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-theme_override_font_sizes/font_size = 19
-text = "Добавить приказ"
+text = "▶ Следующий месяц"
 
-[node name="AdvanceButton" type="Button" parent="Root/Body/Sidebar"]
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-theme_override_font_sizes/font_size = 19
-text = "Следующий месяц"
-
-[node name="Log" type="RichTextLabel" parent="Root/Body/Sidebar"]
+[node name="Log" type="RichTextLabel" parent="Root/Main/Panel"]
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
-theme_override_font_sizes/normal_font_size = 18
-text = "[b]Журнал[/b]\nМир создан. Ожидается первый приказ."
+theme_override_font_sizes/normal_font_size = 16
+text = "[b]Журнал[/b]\nМир создан. Выберите провинцию или отдайте приказ."
 
 [node name="Footer" type="HBoxContainer" parent="Root"]
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 
 [node name="Status" type="Label" parent="Root/Footer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-text = "Симуляция готова"
+theme_override_font_sizes/font_size = 16
