@@ -1,9 +1,9 @@
-name: Сборка NEXUS
+name: Сборка NEXUS v0.1.1
 
 on:
+  workflow_dispatch:
   push:
     branches: ["main"]
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,15 +14,18 @@ jobs:
     steps:
       - name: Получить исходники
         uses: actions/checkout@v5
+
       - name: Настроить JDK 17
         uses: actions/setup-java@v6
         with:
           java-version: "17"
           distribution: "temurin"
+
       - name: Настроить Android SDK
         uses: android-actions/setup-android@v4
         with:
           packages: "platform-tools build-tools;35.0.1 platforms;android-35"
+
       - name: Скачать Godot 4.7.2
         run: |
           mkdir -p /tmp/godot /tmp/godot/templates
@@ -33,30 +36,44 @@ jobs:
           mkdir -p ~/.local/share/godot/export_templates/4.7.2.stable
           cp -r /tmp/godot/templates/templates/* ~/.local/share/godot/export_templates/4.7.2.stable/
           chmod +x /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64
+
+      - name: Создать release keystore
+        run: |
+          keytool -genkeypair -v             -keystore /tmp/nexus-release.keystore             -alias nexus             -keyalg RSA -keysize 2048 -validity 10000             -storepass nexusrelease             -keypass nexusrelease             -dname "CN=NEXUS,O=NEXUS,OU=Game,C=DE"
+
       - name: Импортировать проект
         working-directory: game
         run: /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64 --headless --editor --quit
+
       - name: Собрать Windows
         working-directory: game
         run: |
           mkdir -p build
           /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-release "Windows Desktop" build/NEXUS.exe
           cd build
-          zip -q NEXUS-Windows-v0.1.0.zip NEXUS.exe
-      - name: Собрать Android APK
+          zip -q NEXUS-Windows-v0.1.1.zip NEXUS.exe
+
+      - name: Собрать подписанный Android APK
         working-directory: game
+        env:
+          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: /tmp/nexus-release.keystore
+          GODOT_ANDROID_KEYSTORE_RELEASE_USER: nexus
+          GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: nexusrelease
         run: |
-          /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-debug "Android" build/NEXUS.apk
+          /tmp/godot/bin/Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-release "Android" build/NEXUS.apk
+          apksigner verify --verbose build/NEXUS.apk
+
       - name: Загрузить сборки
         uses: actions/upload-artifact@v4
         with:
-          name: NEXUS-v0.1.0
+          name: NEXUS-v0.1.1
           path: |
-            game/build/NEXUS-Windows-v0.1.0.zip
+            game/build/NEXUS-Windows-v0.1.1.zip
             game/build/NEXUS.apk
           if-no-files-found: error
+
       - name: Опубликовать Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v0.1.0 game/build/NEXUS-Windows-v0.1.0.zip game/build/NEXUS.apk --repo ${{ github.repository }} --title "NEXUS v0.1.0 — первый тестовый билд" --notes "Первый тестовый билд NEXUS. Windows EXE и Android APK."
+          gh release create v0.1.1 game/build/NEXUS-Windows-v0.1.1.zip game/build/NEXUS.apk             --repo ${{ github.repository }}             --title "NEXUS v0.1.1 — Android fix"             --notes "Исправлена Android-сборка: ARM64 + ARMv7, release-подпись и обновлённый versionCode."
