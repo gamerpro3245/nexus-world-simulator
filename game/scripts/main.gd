@@ -5,12 +5,12 @@ extends Control
 @onready var stats_label: Label = $Stats
 @onready var resources_label: Label = $Resources
 @onready var construction_label: Label = $Construction
-@onready var advance_button: Button = $AdvanceButton
-@onready var factory_button: Button = $FactoryButton
-@onready var electronics_button: Button = $ElectronicsButton
-@onready var power_button: Button = $PowerButton
-@onready var save_button: Button = $SaveButton
-@onready var load_button: Button = $LoadButton
+@onready var advance_button: Button = $Buttons/AdvanceButton
+@onready var factory_button: Button = $Buttons/FactoryButton
+@onready var electronics_button: Button = $Buttons/ElectronicsButton
+@onready var power_button: Button = $Buttons/PowerButton
+@onready var save_button: Button = $Buttons/SaveButton
+@onready var load_button: Button = $Buttons/LoadButton
 @onready var status_label: Label = $Status
 
 func _ready() -> void:
