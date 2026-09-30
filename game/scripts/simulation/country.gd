@@ -31,11 +31,32 @@ func apply_monthly_economy(economy: NexusEconomy) -> void:
 func to_dict() -> Dictionary:
 	var province_data: Array = []
 	for province in provinces:
-		province_data.append({"id": province.id, "name": province.province_name, "population": province.population, "infrastructure": province.infrastructure, "jobs": province.jobs, "production": province.production, "development": province.development})
+		province_data.append({
+			"id": province.id,
+			"name": province.province_name,
+			"population": province.population,
+			"infrastructure": province.infrastructure,
+			"jobs": province.jobs,
+			"production": province.production,
+			"development": province.development
+		})
 	var resource_data: Dictionary = {}
 	for key in resources:
 		resource_data[key] = resources[key].to_dict()
-	return {"country_name": country_name, "population": population, "workforce": workforce, "employed": employed, "treasury": treasury, "monthly_income": monthly_income, "monthly_expenses": monthly_expenses, "welfare": welfare, "trust": trust, "corruption": corruption, "provinces": province_data, "resources": resource_data}
+	return {
+		"country_name": country_name,
+		"population": population,
+		"workforce": workforce,
+		"employed": employed,
+		"treasury": treasury,
+		"monthly_income": monthly_income,
+		"monthly_expenses": monthly_expenses,
+		"welfare": welfare,
+		"trust": trust,
+		"corruption": corruption,
+		"provinces": province_data,
+		"resources": resource_data
+	}
 
 func from_dict(data: Dictionary) -> void:
 	country_name = str(data.get("country_name", country_name))
@@ -50,7 +71,11 @@ func from_dict(data: Dictionary) -> void:
 	corruption = float(data.get("corruption", corruption))
 	provinces.clear()
 	for raw in data.get("provinces", []):
-		var province := NexusProvince.new(int(raw.get("id", 0)), str(raw.get("name", "Провинция")), int(raw.get("population", 0)))
+		var province := NexusProvince.new(
+			int(raw.get("id", 0)),
+			str(raw.get("name", "Провинция")),
+			int(raw.get("population", 0))
+		)
 		province.infrastructure = float(raw.get("infrastructure", 50.0))
 		province.jobs = int(raw.get("jobs", 0))
 		province.production = float(raw.get("production", 0.0))
@@ -59,4 +84,10 @@ func from_dict(data: Dictionary) -> void:
 	resources.clear()
 	for key in data.get("resources", {}):
 		var raw_resource: Dictionary = data["resources"][key]
-		resources[key] = NexusResource.new(str(raw_resource.get("name", key)), float(raw_resource.get("amount", 0.0)), float(raw_resource.get("production", 0.0)), float(raw_resource.get("consumption", 0.0)), float(raw_resource.get("price", 1.0))
+		resources[key] = NexusResource.new(
+			str(raw_resource.get("name", key)),
+			float(raw_resource.get("amount", 0.0)),
+			float(raw_resource.get("production", 0.0)),
+			float(raw_resource.get("consumption", 0.0)),
+			float(raw_resource.get("price", 1.0))
+		)
