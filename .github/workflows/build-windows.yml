@@ -1,0 +1,39 @@
+name: NEXUS Windows Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download Godot
+        run: |
+          curl -L https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip -o /tmp/godot.zip
+          curl -L https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz -o /tmp/templates.tpz
+          unzip -q /tmp/godot.zip -d /tmp/godot
+          unzip -q /tmp/templates.tpz -d /tmp/templates
+          mkdir -p ~/.local/share/godot/export_templates/4.7.2.stable
+          find /tmp/templates -name windows_release_x86_64.exe -exec cp {} ~/.local/share/godot/export_templates/4.7.2.stable/ \;
+          find /tmp/templates -name version.txt -exec cp {} ~/.local/share/godot/export_templates/4.7.2.stable/ \;
+          chmod +x /tmp/godot/Godot_v4.7.2-stable_linux.x86_64
+      - name: Validate project
+        working-directory: game
+        run: /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --editor --quit
+      - name: Export Windows
+        working-directory: game
+        run: |
+          mkdir -p build
+          /tmp/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-release "Windows Desktop" build/NEXUS.exe
+          cd build
+          zip -q NEXUS-Windows-x86_64.zip NEXUS.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NEXUS-Windows-x86_64
+          path: game/build/NEXUS-Windows-x86_64.zip
