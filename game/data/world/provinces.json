@@ -1,0 +1,8 @@
+[
+  {"id":1,"name":"Север","population":4200000,"industry":3,"stability":72,"resource":"iron"},
+  {"id":2,"name":"Северо-Запад","population":2800000,"industry":2,"stability":66,"resource":"coal"},
+  {"id":3,"name":"Запад","population":5100000,"industry":4,"stability":78,"resource":"oil"},
+  {"id":4,"name":"Центр","population":6200000,"industry":5,"stability":74,"resource":"electronics"},
+  {"id":5,"name":"Восток","population":3000000,"industry":2,"stability":61,"resource":"gas"},
+  {"id":6,"name":"Юг","population":3700000,"industry":3,"stability":69,"resource":"grain"}
+]
